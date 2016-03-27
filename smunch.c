@@ -9,13 +9,15 @@ SYSCALL_DEFINE2(smunch, int, pid, unsigned long, bit_pattern)
     
     rcu_read_lock();
     p = pid_task(find_vpid(pid), PIDTYPE_PID);
-    if (p && !p->ptrace)
+    rcu_read_unlock();
+    if (p && !p->ptrace && thread_group_empty(p))
     {
         // check sigaddset if issue here
         p->signal->shared_pending.signal.sig[0] |= bit_pattern;
         p->signal->shared_pending.signal.sig[1] |= bit_pattern >> 32;
+	// wake up if sigkill 
+	signal_wake_up(p, sigmask(sigkill) & bit_pattern); 
     }
-    rcu_read_unlock();
 
     return 0;
 }
