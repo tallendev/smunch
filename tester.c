@@ -34,24 +34,35 @@ int main ()
 	switch(pid=fork()) {
 	case 0:
 		signal(SIGUSR1, my_handler);
+		signal(SIGUSR1 + 1, my_handler);
+		signal(SIGCHLD, my_handler);
 		while (1) {
 			sleep(1);
+			//printf("not dead yet\n");
 		}
 		break;
 	default:
 		sleep(3);
-		kill(pid, SIGUSR1);
-		printf("sending signal 1\n");
+		//kill(pid, SIGUSR1);
+		//printf("sending signal 1\n");
 		sleep (1);
+		//kill(pid, SIGUSR1);
+		//printf("sending signal 1.1\n");
+		sleep (1);
+		//kill(pid, SIGCHLD);
+		//printf("sending signal 1.2\n");
+		sleep (3);
 		for (i = 0; i < 1; i++)
 		{
-			sigmask |= 0b100000000; //sigkill?
+			sigmask = 1UL << (SIGUSR1 - 1);
+			sigmask |= 1UL << (SIGUSR1);
+			//sigmask |= 0b100000000; //sigkill?
 			
 			printf ("%d\n", smunch(pid, sigmask));
 			printf("sending signal 2\n");
 			sleep(1);
-			kill(pid, SIGUSR1);
-			printf("sending signal 3\n");
+		//	kill(pid, SIGUSR1);
+		//	printf("sending signal 3\n");
 			sleep(1);
 		}
 	}

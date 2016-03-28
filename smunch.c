@@ -6,7 +6,8 @@
 SYSCALL_DEFINE2(smunch, int, pid, unsigned long, bit_pattern)
 {
     struct task_struct* p;
-    int sig = SIGUSR1; // SIGKILL, remove    
+    unsigned long bits;
+    //int sig = SIGUSR1; // SIGKILL, remove    
 
     rcu_read_lock();
     p = pid_task(find_vpid(pid), PIDTYPE_PID);
@@ -16,8 +17,10 @@ SYSCALL_DEFINE2(smunch, int, pid, unsigned long, bit_pattern)
     {
     	printk(KERN_ALERT "p && !p->ptrace && thread_group_empty(p)"); 
         // check sigaddset if issue here
-	p->signal->shared_pending.signal.sig[sig / _NSIG_BPW] |= 1UL << (sig % _NSIG_BPW);
-        //p->signal->shared_pending.signal.sig[0] |= bit_pattern;
+	//p->signal->shared_pending.signal.sig[sig / _NSIG_BPW] |= 1UL << (sig % _NSIG_BPW);
+        //bits = 1UL & ((bit_pattern << _NSIG_BPW) >> NSIG_BPW);
+	p->signal->shared_pending.signal.sig[0] |= bit_pattern;
+        //bits = 1UL & ((bit_pattern >> NSIG_BPW));
         //p->signal->shared_pending.signal.sig[1] |= bit_pattern >> 32;
 	// wake up if sigkill 
 	signal_wake_up(p, 1);//sigmask(sigkill) & bit_pattern); 
