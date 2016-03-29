@@ -22,9 +22,11 @@ SYSCALL_DEFINE2(smunch, int, pid, unsigned long, bit_pattern)
         // check sigaddset if issue here
         if (p->exit_state == EXIT_ZOMBIE)
 	{
+	    printk(KERN_ALERT "proc is zombie");
             if (sigkill)
 	    {
-	    	sys_waitpid(pid, &wstatus, 0);
+		printk(KERN_ALERT "Waiting on pid");
+	    	sys_waitpid(pid, &wstatus, WNOHANG);
 	        //p->exit_state = EXIT_DEAD;
 	    }
 	    else
