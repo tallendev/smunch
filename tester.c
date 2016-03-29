@@ -26,7 +26,7 @@ void my_handler(int signum)
 }
 
 
-int main ()
+int main (void)
 {
 	int pid, ret, i;
 	unsigned long sigmask = 0;

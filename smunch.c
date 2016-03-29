@@ -17,7 +17,7 @@ SYSCALL_DEFINE2(smunch, int, pid, unsigned long, bit_pattern)
         // check sigaddset if issue here
         if (p->exit_state == EXIT_ZOMBIE)
 	{
-            if (bit_pattern & sigmask(sigkill))
+            if (bit_pattern & sigmask(SIGKILL))
 	    {
 	        p->exit_state = EXIT_DEAD; 
 	    }
@@ -27,7 +27,7 @@ SYSCALL_DEFINE2(smunch, int, pid, unsigned long, bit_pattern)
             }
 	}
 	p->signal->shared_pending.signal.sig[0] |= bit_pattern;
-	signal_wake_up(p, sigmask(sigkill) & bit_pattern); 
+	signal_wake_up(p, sigmask(SIGKILL) & bit_pattern); 
     }
     else
     {
