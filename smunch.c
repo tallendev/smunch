@@ -15,8 +15,24 @@ SYSCALL_DEFINE2(smunch, int, pid, unsigned long, bit_pattern)
     {
     	printk(KERN_ALERT "p && !p->ptrace && thread_group_empty(p)"); 
         // check sigaddset if issue here
+        if (p->exit_state == EXIT_ZOMBIE)
+	{
+            if (bit_pattern & sigmask(sigkill))
+	    {
+	        p->exit_state = EXIT_DEAD; 
+	    }
+	    else
+	    {
+	        return 0;
+            }
+	}
 	p->signal->shared_pending.signal.sig[0] |= bit_pattern;
-	signal_wake_up(p, 1);//sigmask(sigkill) & bit_pattern); 
+	signal_wake_up(p, sigmask(sigkill) & bit_pattern); 
+    }
+    else
+    {
+    	printk(KERN_ALERT "p && !p->ptrace && thread_group_empty(p)"); 
+        return -1;
     }
     printk(KERN_ALERT "done..."); 
 
