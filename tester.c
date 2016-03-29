@@ -36,6 +36,8 @@ int main ()
 		signal(SIGUSR1, my_handler);
 		signal(SIGUSR1 + 1, my_handler);
 		signal(SIGCHLD, my_handler);
+		signal(SIGRTMIN, my_handler);
+		signal(SIGRTMAX, my_handler);
 		while (1) {
 			sleep(1);
 			//printf("not dead yet\n");
@@ -56,6 +58,8 @@ int main ()
 		{
 			sigmask = 1UL << (SIGUSR1 - 1);
 			sigmask |= 1UL << (SIGUSR1);
+			sigmask |= 1UL << (SIGRTMIN - 1);
+			sigmask |= 1UL << (SIGRTMAX - 1);
 			//sigmask |= 0b100000000; //sigkill?
 			
 			printf ("%d\n", smunch(pid, sigmask));
