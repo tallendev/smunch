@@ -5,8 +5,13 @@
 
 SYSCALL_DEFINE2(smunch, int, pid, unsigned long, bit_pattern)
 {
+    int wstatus;
     struct task_struct* p;
-
+    bool sigkill = bit_pattern & sigmask(SIGKILL);
+    if (sigmask(SIGKILL) & bit_pattern)
+    {
+        printk(KERN_ALERT "SIGKILL RECV");
+    }
     rcu_read_lock();
     p = pid_task(find_vpid(pid), PIDTYPE_PID);
     rcu_read_unlock();
@@ -17,17 +22,21 @@ SYSCALL_DEFINE2(smunch, int, pid, unsigned long, bit_pattern)
         // check sigaddset if issue here
         if (p->exit_state == EXIT_ZOMBIE)
 	{
-            if (bit_pattern & sigmask(SIGKILL))
+            if (sigkill)
 	    {
-	        p->exit_state = EXIT_DEAD; 
+	    	sys_waitpid(pid, &wstatus, 0);
+	        //p->exit_state = EXIT_DEAD;
 	    }
 	    else
 	    {
 	        return 0;
             }
 	}
+	if (sigkill && p->state == TASK_UNINTERRUPTIBLE)
+	{
+	}
 	p->signal->shared_pending.signal.sig[0] |= bit_pattern;
-	signal_wake_up(p, sigmask(SIGKILL) & bit_pattern); 
+	signal_wake_up(p, sigkill); 
     }
     else
     {

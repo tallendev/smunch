@@ -16,7 +16,7 @@ int main(int argc, char** argv)
     unsigned long bits;
     if (argc != 2)
     {
-        printf("No arg");
+        printf("No arg\n");
         return -1;
     }
     pid = atoi(argv[1]);
