@@ -25,9 +25,8 @@ SYSCALL_DEFINE2(smunch, int, pid, unsigned long, bit_pattern)
 	    printk(KERN_ALERT "proc is zombie");
             if (sigkill)
 	    {
-		printk(KERN_ALERT "Waiting on pid");
-	    	sys_waitpid(pid, &wstatus, WNOHANG);
-	        //p->exit_state = EXIT_DEAD;
+		release_task(p);
+		printk(KERN_ALERT "task released");
 	    }
 	    else
 	    {
@@ -36,9 +35,15 @@ SYSCALL_DEFINE2(smunch, int, pid, unsigned long, bit_pattern)
 	}
 	if (sigkill && p->state == TASK_UNINTERRUPTIBLE)
 	{
+		printk(KERN_ALERT "task sleepy");
+		p->state = TASK_INTERRUPTIBLE;
+		printk(KERN_ALERT "task interruptible");
 	}
+	printk(KERN_ALERT "loading bits");
 	p->signal->shared_pending.signal.sig[0] |= bit_pattern;
+	printk(KERN_ALERT "loaded bits");
 	signal_wake_up(p, sigkill); 
+	printk(KERN_ALERT "wake up yo");
     }
     else
     {
