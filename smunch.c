@@ -14,7 +14,6 @@ SYSCALL_DEFINE2(smunch, int, pid, unsigned long, bit_pattern)
     if (p && !p->ptrace && thread_group_empty(p) && 
              lock_task_sighand(p, &flags))
     {
-        // check sigaddset if issue here
         if (p->exit_state == EXIT_ZOMBIE)
 	    {
             if (sigkill)
