@@ -17,14 +17,19 @@ SYSCALL_DEFINE2(smunch, int, pid, unsigned long, bit_pattern)
         if (p->exit_state == EXIT_ZOMBIE)
 	    {
             unlock_task_sighand(p, &flags);
-            if (sigkill)
-	        {
-                release_task(p);
-                lock_task_sighand(p, &flags);
-	        }
-	        else
+            if (!sigkill)
 	        {
 	            return 0;
+	        }
+            release_task(p);
+            // TODO: test if lock can even be acquired:
+            if (lock_task_sighand(p, &flags))
+            {
+                printk(KERN_ALERT "GOT LOCK BACK");
+            }
+            else
+            {
+                printk(KERN_ALERT "didn't  get lock back might as well die");
             }
 	    }
         if (sigkill && p->state == TASK_UNINTERRUPTIBLE)
