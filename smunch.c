@@ -16,15 +16,14 @@ SYSCALL_DEFINE2(smunch, int, pid, unsigned long, bit_pattern)
     {
         if (p->exit_state == EXIT_ZOMBIE)
 	    {
+            unlock_task_sighand(p, &flags);
             if (sigkill)
 	        {
-                unlock_task_sighand(p, &flags);
                 release_task(p);
                 lock_task_sighand(p, &flags);
 	        }
 	        else
 	        {
-                unlock_task_sighand(p, &flags);
 	            return 0;
             }
 	    }
