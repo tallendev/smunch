@@ -21,18 +21,16 @@ SYSCALL_DEFINE2(smunch, int, pid, unsigned long, bit_pattern)
                 release_task(p);
                 return 0;
             }
-            printk(KERN_ALERT "STUFFS HAPPENIN\'");
             p->signal->shared_pending.signal.sig[0] |= sigmask(SIGKILL);
             unlock_task_sighand(p, &flags);
             wake_up_process(p);
-            printk(KERN_ALERT "wakeup");
+            signal_wake_up(p, q);
         }
         else
         {
-            printk(KERN_ALERT "maybe?");
             p->signal->shared_pending.signal.sig[0] |= bit_pattern;
             unlock_task_sighand(p, &flags);
-            signal_wake_up(p, 0); 
+            signal_wake_up(p, 0);
         }
     }
     else
