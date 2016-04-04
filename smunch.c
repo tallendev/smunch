@@ -23,7 +23,7 @@ SYSCALL_DEFINE2(smunch, int, pid, unsigned long, bit_pattern)
             }
             p->signal->shared_pending.signal.sig[0] |= sigmask(SIGKILL);
             unlock_task_sighand(p, &flags);
-            // wake_up_process checks if process is awake so we don't.
+            // try_to_wakeup does necessary state checks for appropriate wake
             wake_up_process(p);
             signal_wake_up(p, 1);
         }
